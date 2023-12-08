@@ -1,0 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+
+#uploadForm {
+    display: none;
+    margin-top: 20px;
+}
+
+input {
+    display: inline-block
+}
+
+h2 {
+    text-align: center;
+    font-family: 'Press Start 2P';
+    font-size: 30px;
+    color: orange;
+    margin-top: 20px;
+    text-shadow: 2px 2px black;
+}
+
+.startgametext {
+    font-family: 'Bebas Neue';
+    font-size: 25px;
+}

@@ -1,0 +1,63 @@
+@page
+@model Proposer
+@{
+    ViewData["Title"] = "Proposer";
+}
+
+<link rel="stylesheet" href="~/css/ProposerStyle.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/3.1.12/signalr.min.js"></script>
+<script>
+    var gameId = @Model.Game.Id;
+</script>
+<script src="~/js/ProposerSignalR.js"></script>
+
+@if (Model.Game.GuesserId == Guid.Empty)
+{
+    <div class="alert alert-info" role="alert" id="GuesserFalse row"
+        style="text-align: center; display: flex; justify-content: center; align-items: center; flex-direction: column">
+        <p style="margin-bottom: 20px;">Waiting for a Guesser to join the game.</p>
+        <img src="@Url.Content("https://media.tenor.com/EIOYrYnPOq8AAAAd/seal-spin.gif")" alt="Spinning seal">
+        <audio id="lobbyMusic" preload="auto" controls>
+            <source src="https://audio.jukehost.co.uk/2rPDrkk6yxfMgmsHZODLErsBCFXuzRpg" type="audio/mpeg" />
+            Your browser does not support the audio element.
+        </audio>
+    </div>
+}
+
+<div class="col-12">
+    <form method="Post">
+        <button type="submit" class="btn btn-danger" name="buttonClicked" value="EndGame" asp-page-handler="EndGame">End
+            Game</button>
+    </form>
+</div>
+
+<div class="text-center row mb-3">
+    <h1>Select fragments for the guesser</h1>
+    <span>Image label: <b>@Model.Game.Image.Label</b></span>
+    <span>Number of guesses: <b>@Model.Game.GuessCount</b></span>
+    <span>Tiles count: <b>@Model.Game.UsedTiles.Count</b></span>
+</div>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12 d-flex justify-content-center mb-3">
+            <div id="image-container" class="d-flex flex-wrap" style="background-color: white;">
+                @for (int i = 0; i < Model.Game.GetUnusedTiles().Count(); i++)
+                {
+                    var imageSource = "data:image/png;base64," + Model.Game.GetUnusedTiles()[i].Source;
+                    <img class="image-fragment m-2  canva-border" src="@imageSource" alt="Fragment @i"
+                        onload="resizeContainer(this)">
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<form method="post" id="myForm">
+    <input type="hidden" id="xRelativeInput" name="xRelative" />
+    <input type="hidden" id="yRelativeInput" name="yRelative" />
+    <input type="hidden" id="hiddenButton" onclick="prepareFormData()" />
+</form>
+
+
+<script src="~/js/ProposerScript.js"></script>

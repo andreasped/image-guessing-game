@@ -1,0 +1,75 @@
+@page
+@model TwoPlayerLobby
+@{
+	ViewData["Title"] = "ActiveGamesLobby";
+}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/3.1.12/signalr.min.js"></script>
+<script src="~/js/GameLobbyScript.js"></script>
+
+
+<h4>Create or Join A Two Player Game</h4>
+
+<form method="post">
+	<button type="submit" class="btn btn-info btn-lg startgametext" asp-page-handler="CreateTwoPlayerGame"
+		onclick="RemoveFromLobbyGroup()">
+		<i class="bi bi-person"></i>
+		@if (!Model.HasUserActiveGame())
+		{
+			<span>Create Game</span>
+		}
+		else
+		{
+			<span>Continue Game</span>
+		}
+	</button>
+</form>
+
+<div>
+	<table class="table  table-striped table-hover">
+		<thead>
+			<tr>
+				<th scope="col">Id</th>
+				<th scope="col">Waiting player</th>
+				<th scope="col">Status</th>
+				<th scope="col">Join Game</th>
+			</tr>
+		</thead>
+		<tbody>
+			@if (Model.Games.Count == 0)
+			{
+				<tr>
+					<td style="color:red;" colspan="4">No active games available</td>
+				</tr>
+			}
+			@foreach (var game in Model.Games)
+			{
+				<tr>
+					<td>@game.Id</td>
+					<td>@game.GameStatus</td>
+					@if (game.GameType == Core.Domain.Game.GameType.TwoPlayer)
+					{
+						<td>Proposer id: @game.ProposerId</td>
+						<td>
+							<form method="post">
+								<button type="submit" class="btn btn-info btn-lg startgametext" asp-page-handler="JoinGame"
+									asp-route-GameId="@game.Id" onclick="RemoveFromLobbyGroup()"><i class="bi bi-person"></i>
+									Join Game</button>
+							</form>
+						</td>
+					}
+					@if (game.GameType == Core.Domain.Game.GameType.SinglePlayer)
+					{
+						<td>Guesser id: @game.GuesserId</td>
+					}
+				</tr>
+			}
+		</tbody>
+	</table>
+	@if ((!string.IsNullOrEmpty(ViewData["Alert"] as string)))
+	{
+		<div class="alert alert-info" role="alert">
+			@ViewData["Alert"]
+		</div>
+	}
+</div>

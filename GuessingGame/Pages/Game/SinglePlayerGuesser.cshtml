@@ -1,0 +1,98 @@
+@page
+@model SinglePlayerGuesserModel
+@{
+    ViewData["Title"] = "Game";
+}
+
+<link rel="stylesheet" href="~/css/GuesserStyle.css">
+
+@{
+    if ((!string.IsNullOrEmpty(ViewData["Alert"] as string) && ViewData["Alert"].ToString() == "Correct Answer! Please click the 'Save Score and Return to Menu' button to end the game!"))
+    {
+        <div class="fireworks" id="fireworks"></div>
+
+        <div>
+            <form method="Post">
+                <button type="submit" class="btn btn-success" name="buttonClicked" value="SaveScoreAndExit" onclick="clearLocalStorage()" asp-page-handler="SaveScoreAndExit">Save Score and Return to Menu</button>
+            </form> 
+        </div>
+        <br>
+        <div>
+            <form method="Post">
+                <button type="submit" class="btn btn-success" name="buttonClicked" value="" onclick="clearLocalStorage()" asp-page-handler="UserDefinedSequence">Propose better segments</button>
+            </form> 
+        </div>
+        <br>
+        <div class="alert alert-info" role="alert">
+            @ViewData["Alert"]
+        </div>
+    }
+    else
+    {
+        <div style="text-align: center; display: flex; justify-content: center; align-items: center;">
+            <div id="timer-container" style="margin: 0; margin-right: 5em;">
+                <div style="display: flex; align-items: center;">
+                    <h3>Time left to guess:&nbsp;</h3>
+                    <h3><b><div id="timer"></div></b></h3>
+                </div>
+                <div id="progress-bar">
+                    <div id="progress-bar-inner"></div>
+                </div>
+            </div>
+
+            <div>
+                <div style="display: flex; justify-content: center; gap: 10px;">
+                    <form method="post" style="display: flex; flex-direction: row; width: auto; gap: 10px;">
+                        <input type="text" id="UserGuessInput" name="UserGuess" class="form-control" required placeholder="Guess the image label">
+                        <button type="submit" class="btn btn-success" name="buttonClicked" value="verifyGuess" asp-page-handler="VerifyGuess">Check</button>
+                    </form>
+                </div>
+            
+                <div style="display: flex; justify-content: center; gap: 10px;">
+                    <form method="post">
+                        <button type="submit" class="btn btn-secondary mt-3" name="buttonClicked" value="nextTile" asp-page-handler="NextTile">Show One More Tile</button>
+                    </form>
+                    <form method="Post">
+                        <button type="submit" class="btn btn-danger mt-3" name="buttonClicked" value="GiveUp" id="GiveUpBtn" onclick="clearLocalStorage()" asp-page-handler="GiveUp">Surrender</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        if (!string.IsNullOrEmpty(ViewData["Alert"] as string))
+        {
+            var alertMessage = ViewData["Alert"].ToString();
+            var alertClass = "alert-danger";
+
+            <div class="alertmessage @alertClass" id="flashMessage" role="alert">
+                @alertMessage
+            </div>
+        }
+        
+        if ((!string.IsNullOrEmpty(ViewData["Alert"] as string) && ViewData["Alert"].ToString() == "You did not manage to guess correctly."))
+        {
+            var alertmessage = ViewData["Alert"].ToString();
+            <text>
+                <script>
+                    localStorage.clear();
+                    setTimeout(function() {
+                        alert('@alertmessage');
+                        window.location.href = '/Menu/GameMenu';
+                    }, 100);
+                </script>
+            </text>
+        }
+    }
+}
+
+<div style="text-align: center;">
+    <canvas id="myCanvas" class="canva-border" width="500" height="500"></canvas>
+</div>
+
+
+<script>
+    var secondsForTimer = @Model.SECONDS_FOR_TIMER;
+    var tilesData = @Html.Raw(Json.Serialize(Model.Game.UsedTiles));
+</script>
+<script src="~/js/GuesserScript.js"></script>
+<script src="~/js/Fireworks.js"></script>

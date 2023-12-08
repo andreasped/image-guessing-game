@@ -1,0 +1,221 @@
+@page
+@model GameMenuModel
+@{
+	ViewData["Title"] = "GameMenu";
+}
+
+<link rel="stylesheet" href="~/css/GameMenuStyle.css">
+<script src="~/js/GameMenuScript.js"></script>
+
+<h2>Ready to Play, @Model.Username?</h2>
+
+
+@if (TempData["SuccessMessage"] == "Image upload successful!")
+{
+	<div class="alert alert-success alert-dismissible fade show" role="alert">
+		@TempData["SuccessMessage"]
+	</div>
+}
+else if (TempData["SuccessMessage"] != null)
+{
+	<div class="alert alert-danger alert-dismissible fade show" role="alert">
+		@TempData["SuccessMessage"]
+	</div>
+}
+<div class="container">
+	<button onclick="toggleForm()" class="btn btn-light">Upload Your Own Image</button>
+
+	<form method="post" enctype="multipart/form-data" id="uploadForm">
+		<p>For automatic slicing, just press "Upload Image" without x-grid and y-grid</p>
+		<div class="form-row">
+			<div class="form-group col-md-6">
+				<label for="upload">Choose File:</label>
+				<input type="file" class="form-control-file" name="Upload" id="upload"
+					accept="image/png, image/jpeg, image/jpg" />
+			</div>
+
+			<div class="form-group col-md-4">
+				<label for="label">Image label:</label>
+				<input type="text" class="form-control" name="Label" id="label" required />
+			</div>
+		</div>
+
+		<div class="form-row mb-3">
+			<div class="form-group col-md-4">
+				<label for="GridX">Choose x-grid length:</label>
+				<input type="number" class="form-control" id="GridX" name="GridX" min="7" max="9">
+			</div>
+
+			<div class="form-group col-md-4">
+				<label for="GridY">Choose y-grid length:</label>
+				<input type="number" class="form-control" id="GridY" name="GridY" min="7" max="9">
+			</div>
+		</div>
+		<div class="form-row mb-3">
+			<button type="submit" class="btn btn-light" asp-page-handler="UploadImage">Upload Image</button>
+		</div>
+	</form>
+</div>
+
+<div>
+	<div style="text-align: center; margin-top: 20px;">
+		<form method="post">
+			<button type="submit" class="btn btn-info btn-lg startgametext" asp-page-handler="SingleplayerGame"><i
+					class="bi bi-person"></i> Start SinglePlayer Game</button>
+		</form>
+	</div>
+	<div>
+		<div style="text-align: center; margin-top: 20px;">
+			<form method="post">
+				<button type="submit" class="btn btn-info btn-lg startgametext" asp-page-handler="RedirectToLobby"><i
+						class="bi bi-people"></i> TwoPlayer Game</button>
+			</form>
+		</div>
+
+		@* Scoreboard *@
+		<div class="container text-center mt-4 table-responsive">
+			<div class="text-left row">
+
+				@* Recent Games *@
+				<div class="col-md-4 text-left table-responsive w-100">
+					<h4 class="display-7 mt-5">Recent Games</h4>
+					<table class="table bg-success table-hover table-responsive">
+						<thead class="table-dark">
+							<tr>
+								<th scope="col">Date Played</th>
+								<th scope="col">Game ID</th>
+								<th scope="col">Guesser</th>
+								<th scope="col">Proposer</th>
+								<th scope="col">Score</th>
+								<th scope="col">Time Used</th>
+								<th scope="col">Guess Count</th>
+								<th scope="col">Game Type</th>
+							</tr>
+						</thead>
+						<tbody>
+							@foreach (var score in Model.Leaderboard.OrderByDescending(s => s.DateTime).Take(10))
+							{
+								if (@score.GuesserId == Guid.Empty)
+								{
+									<tr></tr>
+								}
+								else
+								{
+									<tr>
+										<th scope="row">@score.DateTime.ToString("yyyy-MM-dd HH:mm:ss")</th>
+										<td>@score.GameId</td>
+										<td>@score.GuesserId</td>
+										@if (score.ProposerId == Guid.Empty)
+										{
+											<td>Oracle</td>
+										}
+										else
+										{
+											<td>@score.ProposerId</td>
+										}
+										<td>@score.Score</td>
+										@if (score.Score == 0)
+										{
+											<td>N/A</td>
+										}
+										else
+										{
+											<td>@Math.Truncate(score.TimeUsed.TotalSeconds)s</td>
+										}
+										<td>@score.GuessCount</td>
+										<td>@score.ResultType</td>
+									</tr>
+								}
+							}
+						</tbody>
+					</table>
+				</div>
+
+				@* Team Leaderboard *@
+				<div class="col-md-4 text-left table-responsive w-100">
+					<table class="table bg-info table-hover">
+						<thead class="table-dark">
+							<tr>
+								<h4 class="display-7 mt-5">Top 10 Team Players</h4>
+								<th scope="col">Score</th>
+								<th scope="col">Time Used</th>
+								<th scope="col">Guess Count</th>
+								<th scope="col">Guesser</th>
+								<th scope="col">Proposer</th>
+								<th scope="col">Game ID</th>
+								<th scope="col">Date Played</th>
+							</tr>
+						</thead>
+						<tbody>
+							@foreach (var score in Model.Leaderboard.Where(s => s.ResultType ==
+												ResultType.TwoPlayer).OrderByDescending(s => s.Score).Take(10))
+							{
+								if (@score.GuesserId == Guid.Empty)
+								{
+									<tr></tr>
+								}
+								else
+								{
+									<tr>
+										<th scope="row">@score.Score</th>
+										@if (score.Score == 0)
+										{
+											<td>N/A</td>
+										}
+										else
+										{
+											<td>@Math.Truncate(score.TimeUsed.TotalSeconds)s</td>
+										}
+										<td>@score.GuessCount</td>
+										<td>@score.GuesserId</td>
+										<td>@score.ProposerId</td>
+										<td>@score.GameId</td>
+										<td>@score.DateTime.ToString("yyyy-MM-dd HH:mm:ss")</td>
+									</tr>
+								}
+							}
+						</tbody>
+					</table>
+				</div>
+
+				@* Singleplayer Leaderboard *@
+				<div class="col-md-4 text-left table-responsive w-100">
+					<table class="container table bg-primary table-hover">
+						<thead class="table-dark">
+							<tr>
+								<h4 class="display-7 mt-5">Top 10 Single Players</h4>
+								<th scope="col">Score</th>
+								<th scope="col">Time Used</th>
+								<th scope="col">Guess Count</th>
+								<th scope="col">Player</th>
+								<th scope="col">Game ID</th>
+								<th scope="col">Date Played</th>
+							</tr>
+						</thead>
+						<tbody>
+							@foreach (var score in Model.Leaderboard.Where(s => s.ResultType ==
+												ResultType.SinglePlayer).OrderByDescending(s => s.Score).Take(10))
+							{
+								<tr>
+									<th scope="row">@score.Score</th>
+									@if (score.Score == 0)
+									{
+										<td>N/A</td>
+									}
+									else
+									{
+										<td>@Math.Truncate(score.TimeUsed.TotalSeconds)s</td>
+									}
+									<td>@score.GuessCount</td>
+									<td>@score.GuesserId</td>
+									<td>@score.GameId</td>
+									<td>@score.DateTime.ToString("yyyy-MM-dd HH:mm:ss")</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

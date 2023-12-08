@@ -1,0 +1,30 @@
+#image-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.image-fragment {
+    border: 2px solid #000;
+    cursor: pointer;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: background 0.2s ease-in-out;
+    display: inline-block;
+    overflow: hidden;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.canva-border {
+    border: 0.5rem outset rgb(153, 98, 66);
+    box-shadow: 0 0 0 1.5rem rgb(68, 35, 4);
+    font: bold 1rem sans-serif;
+    margin: 2rem;
+    outline-offset: 0.5rem;
+}

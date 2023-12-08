@@ -1,0 +1,54 @@
+@page
+@model GuessingGame.Pages.Game.UserDefinedSequence
+@{
+    ViewData["Title"] = "UserDefinedSequence";
+}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/3.1.12/signalr.min.js"></script>
+<link rel="stylesheet" href="~/css/ProposerStyle.css">
+<script src="~/js/ProposerScript.js"></script>
+
+<div class="container mt-4">
+    <div class="text-center row mb-3">
+        <h1>Select a better tile sequence</h1>
+    </div>
+
+    <div class="text-center">
+        <form method="Post">
+            <button type="submit" class="btn btn-success" name="buttonClicked" value="SaveScoreAndRedirect"
+                onclick="clearLocalStorage()" asp-page-handler="SaveScoreAndRedirect">Save game and sequence and Return
+                to Menu</button>
+        </form>
+    </div>
+    <br>
+</div>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12 d-flex justify-content-center mb-3">
+            <div id="image-container" class="d-flex flex-wrap" style="background-color: white;">
+                @for (int i = 0; i < Model.Game.Image.Tiles.Count(); i++)
+                {
+                    var imageSource = "data:image/png;base64," + Model.Game.Image.Tiles[i].Source;
+                    <img class="image-fragment m-2 canva-border" src="@imageSource" alt="Fragment @i"
+                        onclick="handleFragmentHover(event)" onload="resizeContainer(this)">
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<form method="post" id="myForm">
+    <input type="hidden" id="xRelativeInput" name="xRelative" />
+    <input type="hidden" id="yRelativeInput" name="yRelative" />
+    <input type="hidden" id="hiddenButton" onclick="prepareFormData()" />
+</form>
+
+<script>
+    function handleFragmentHover(event) {
+        document.getElementById('xRelativeInput').value = event.offsetX;
+        document.getElementById('yRelativeInput').value = event.offsetY;
+        document.getElementById('myForm').submit();
+    }
+</script>

@@ -1,0 +1,47 @@
+﻿@page
+@model IndexLoginModel
+
+<div class="container container-login">
+    <div class="row">
+        <div class="col login-container mt-5 pt-5">
+            <h2 class="text-center">LOGIN</h2>
+            <section>
+                <form method="post" asp-route-returnUrl="@Model.ReturnUrl">
+                    <hr />
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <label asp-for="UserInput.UserName"> Username </label>
+                        <input asp-for="UserInput.UserName" class="form-control" required />
+                        <span asp-validation-for="UserInput.UserName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group pt-2">
+                        <label asp-for="UserInput.Password"></label>
+                        <input asp-for="UserInput.Password" class="form-control" type="password" required />
+                        <span asp-validation-for="UserInput.Password" class="text-danger"></span>
+                    </div>
+                    <div class="form-group pt-2 d-flex justify-content-center">
+                        <button type="submit" class="btn btn-outline-dark mt-2 mb-2">Log in</button>
+                    </div>
+                </form>
+            </section>
+            <h6 class="pt-2 d-flex justify-content-center">
+                Don't have a user? Register &nbsp;<a asp-page="/Auth/Register">here</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .container-login {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .login-container {
+        background-color: rgba(255, 255, 255, 0.721);
+        padding: 2rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+        width: 30rem;
+    }
+</style>
